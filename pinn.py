@@ -250,9 +250,7 @@ class NeuralNetwork(nn.Module):
             temp_var = list(pde.domain.keys())[-1]
 
             data = [torch.arange(*domain, step) for domain in pde.domain.values()]
-            len_space = len(data[0])
 
-            spatial_data = data[:-1]
             temp_data = data[-1].detach().numpy()
 
             grid_1, grid_2, grid_3 = torch.meshgrid(*data, indexing='ij')
@@ -283,7 +281,7 @@ class NeuralNetwork(nn.Module):
                     for plot in range(ncols):
                 
                         ax[eq, plot].clear()           
-                        simulation = ax[eq, plot].contourf(grid_1[:,:,0], grid_2[:,:,0], plots[plot][eq].reshape_as(grid_1)[:,:,i].detach(), cmap='Spectral')
+                        simulation = ax[eq, plot].contourf(grid_1[:,:,0], grid_2[:,:,0], plots[plot][eq].reshape_as(grid_1)[:,:,0].detach(), cmap='Spectral')
                         fig.colorbar(simulation)
                         ax[eq, plot].set_title(titles[plot],fontdict={'size': 16})
                         ax[eq, plot].set_xlabel(f'${var_names[0]}$')
@@ -563,7 +561,7 @@ class Trainer:
             
         if samples.get('initial', 0) > 0 and hasattr(self.pde, 'initial_condition'):
             data_initial = self.pde.get_points(samples['initial'], device=self.device, at_initial=True, requires_grad=True)
-            target_initial = torch.zeros(samples['boundary'], device=self.device)
+            target_initial = torch.zeros(samples['initial'], device=self.device)
         else:
             data_initial, target_initial = None, None
         
